@@ -1,0 +1,183 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Site do proggers bookclub">
+    <meta name="keywords" content="programming, programação, clube do livro, bookclub">
+    <link rel="stylesheet" href="holiday.css">
+    <title>Registro dos encontros: Proggers Bookclub</title>
+    <style>
+        h2:target::before {
+            content: ">> ";
+        }
+    </style>
+</head>
+<body>
+<h1>Data Structures and Algorithm Analysis in C++</h1>
+
+<p>Sugestão de metodologia:</p>
+
+<ul>
+<li>no início do encontro, a pessoa responsável fala quais tópicos do capítulo gostaria de discutir.</li>
+<li>os participantes sugerem tópicos adicionais</li>
+<li>os tópicos são compilados em uma listagem como <code>[]</code></li>
+<li>conforme os tópicos são cobertos, vão sendo marcados como done <code>[x]</code></li>
+<li>novos tópicos que surgirem são adicionados na lista como undone <code>[]</code></li>
+</ul>
+
+<p>Assim no final de cada encontro temos um registro do que foi discutido.</p>
+
+<h2>1º encontro: 26/11/2025</h2>
+
+<p><strong>Chapter 1 Programming: A General Overview</strong></p>
+
+<h3>Tópicos do encontro:</h3>
+
+<ul>
+<li>[x] Método indutivo e formas de provar hipóteses/teoremas
+<ul>
+<li>[x] Conversa sobre funções puras e impuras</li>
+<li>[x] Conversa sobre exemplos <code>bad</code> e <code>printOut</code></li>
+</ul></li>
+<li>[x] Definição de recursividade</li>
+<li>[] Definição de pointers, Lvalues/Rvalues</li>
+<li>[x] Sintaxe para Classes e exemplo (IntCell)</li>
+<li>[x] Problema da seleção
+<ul>
+<li>[x] análise da questão e debate</li>
+<li>[] implementação</li>
+</ul></li>
+<li>[] Problema da busca de palavras (wordsearch)
+<ul>
+<li>[] análise da questão e debate</li>
+<li>[] Roast da implementação do guilherme</li>
+</ul></li>
+</ul>
+
+<h3>Snippets:</h3>
+
+<pre><code># bad.py
+
+def bad(n: int):
+    print(f"n = {n}")
+    if n == 0:
+        return 0
+    else:
+        return bad(n / 3 + 1) + n - 1
+
+
+bad(6)
+
+------------
+
+/**
+* classes.cpp
+* A class for simulating an integer memory cell.
+*/
+
+#include &lt;iostream&gt;
+
+class IntCell
+{
+    public:
+    explicit IntCell( int initialValue = 0 )
+    : storedValue{ initialValue } { }
+    int read( ) const
+    { return storedValue; }
+    void write( int x )
+    { storedValue = x; }
+
+    private:
+    int storedValue;
+};
+
+
+int main() {
+    IntCell cell{3.5}; // throws error
+    IntCell cell2 = IntCell(2.5);
+    std::cout &lt;&lt; cell.read();
+    std::cout &lt;&lt; cell2.read();
+}
+
+------------
+
+# loop.py
+
+def loop(x):
+    if x == 5:
+        return loop(5)
+
+    return loop(x-1)
+
+loop(10)
+
+------------
+
+/**
+* printout.cpp
+**/
+
+#include &lt;iostream&gt;
+
+void printOut( int n );
+int main() {
+    printOut(11);
+}
+
+void printOut( int n )
+{
+    if ( n &gt;= 10 ) {
+        printOut( n / 10 );
+    }
+    std::cout &lt;&lt; n % 10;
+}
+
+------------
+
+# printout.py
+
+def printOut(n: int):
+    if n &gt;= 10:
+        printOut( n / 10)
+    print( n % 10 )
+
+
+printOut(11)
+
+------------
+
+# vector.py
+
+class Vector():
+
+    def __init__(self, v):
+        self.v = v
+
+    def __add__(self, other):
+        return self.v + other.v
+
+    def add(self, other):
+        return self.v + other.v
+
+
+v1 = Vector(1)
+v2 = Vector(2)
+
+print(v1 + v2)
+
+print(v1.add(v2))
+</code></pre>
+
+<h3>Questões sugeridas:</h3>
+
+<ul>
+<li><a href="https://leetcode.com/problems/word-search">https://leetcode.com/problems/word-search</a></li>
+<li><a href="https://leetcode.com/problems/kth-largest-element-in-an-array/description/">selection problem</a></li>
+</ul>
+
+</body>
+</html>
+
