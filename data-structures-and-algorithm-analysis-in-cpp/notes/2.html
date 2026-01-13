@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Site do proggers bookclub">
+    <meta name="keywords" content="programming, programação, clube do livro, bookclub">
+    <link rel="stylesheet" href="../../holiday.css">
+    <title>Registro dos encontros: Proggers Bookclub</title>
+    <style>
+        h2:target::before {
+            content: ">> ";
+        }
+    </style>
+</head>
+<body>
+
+<div class="markdown-heading"><h1 class="heading-element">C++ Primer</h1><a id="user-content-c-primer" class="anchor" aria-label="Permalink: C++ Primer" href="#c-primer"><span aria-hidden="true" class="octicon octicon-link"></span></a></div>
+<div class="markdown-heading"><h2 class="heading-element">Array vs. Vector</h2><a id="user-content-array-vs-vector" class="anchor" aria-label="Permalink: Array vs. Vector" href="#array-vs-vector"><span aria-hidden="true" class="octicon octicon-link"></span></a></div>
+<div class="markdown-heading"><h3 class="heading-element">Array (C-style):</h3><a id="user-content-array-c-style" class="anchor" aria-label="Permalink: Array (C-style):" href="#array-c-style"><span aria-hidden="true" class="octicon octicon-link"></span></a></div>
+<ul>
+<li>Sao os arrays primitivos herdados do C, eles nao sabem seu proprio tamanho e tambem nao podem ser copiados com <code>=</code>.</li>
+<li>Um array primitivo eh basicamente um pointer disfarcado, ou seja, quando voce <em>declara</em> <code>int arr[5]</code>, essa variavel na verdade so eh um pointer para algum bloco de memoria, nao um objeto inteiro.</li>
+<li>Ele tambem nao sabe o quao grande ele eh, entao quando tu passa ele pra alguma funcao, ele basicamente esquece o tamanho original, te obrigando a passar o tamanho como um segundo param(ex: <code>void func(int* arr, int size)</code>), e caso tu nao passe o tam dele, a funcao nao vai saber quando parar de ler, podendo causar <em>segment faults</em>.
+<em>segment fault</em>: tu tentou mexer num bloco de memoria que nao te pertence/existe mais, e o sistema operacional por motivos de seguranca chutou tua bunda.</li>
+</ul>
+<p>Alem disso tudo, voce NAO pode usar o copy constructor dele.
+ex: <code>arr1 = arr2;</code>
+Como eles sao apenas pointers, o <code>arr2</code> seria um pointer para o mesmo local de memoria do <code>arr1</code>, oq alem de ilegal, eh muito perigoso.</p>
+<div class="highlight highlight-source-c++"><pre><span class="pl-k">void</span> <span class="pl-en">badContainer</span>()
+{
+    <span class="pl-k">int</span> arrSize{ <span class="pl-c1">5</span> };
+    <span class="pl-k">int</span> arr[arrSize] = { <span class="pl-c1">10</span>, <span class="pl-c1">20</span>, <span class="pl-c1">30</span>, <span class="pl-c1">40</span>, <span class="pl-c1">50</span> };
+
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>item 0: <span class="pl-pds">"</span></span> &lt;&lt; arr[<span class="pl-c1">0</span>] &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span><span class="pl-pds">"</span></span>; <span class="pl-c"><span class="pl-c">//</span> "Seguro" pq o index [0] existe</span>
+
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>item 5?: <span class="pl-pds">"</span></span> &lt;&lt; arr[<span class="pl-c1">5</span>] &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span><span class="pl-pds">"</span></span>; <span class="pl-c"><span class="pl-c">//</span> Provavelmente vai printar um numero aleatorio pq o index [5] nao existe entao o pointer aponta pra pro proximo index fora do array, ou seja, memoria suja/lixo. causa undefined behaviour.</span>
+    
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>item 100000??: <span class="pl-pds">"</span></span> &lt;&lt; arr[<span class="pl-c1">100000</span>] &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span><span class="pl-pds">"</span></span>;  <span class="pl-c"><span class="pl-c">//</span> index nao pertence ao array e provavelmente, por ser mt distante, nem a pagina de memoria do programa em si. causa segment fault (acessar memoria mt longe).</span>
+}
+
+<span class="pl-k">int</span> <span class="pl-en">main</span>()
+{
+    <span class="pl-c1">badContainer</span>();
+    <span class="pl-k">return</span> <span class="pl-c1">0</span>;
+}
+</pre></div>
+<div class="markdown-heading"><h3 class="heading-element">
+<code>std::vector</code>:</h3><a id="user-content-stdvector" class="anchor" aria-label="Permalink: std::vector:" href="#stdvector"><span aria-hidden="true" class="octicon octicon-link"></span></a></div>
+<ul>
+<li>os <code>std::vector</code> sao a implementacao da biblioteca padrao do c++ (STL) e corrige os defeitos do array(fuck you C).</li>
+<li>ele eh um objeto de <em>primeira classe</em> pq:
+- <strong>Ele conhece seu tamanho;</strong> <code>.size()</code> sempre retorna o numero exato de elementos do vector;
+- <strong>Copy ctor completo;</strong> se tu fizer <code>vec1 = vec2;</code> o compiler vai criar uma copia completa e independente com todos os dados/membros de um vector pro outro.
+- <strong>Tem tamanho dinamico;</strong> ao contrario do array, o vector pode crescer sem problemas, voce pode comecar ele vazio e adicionar elementos com <code>push_back()</code> por exemplo, e ele gerencia a memoria interna, expandindo-se conforme necessario.
+- <strong>Pode ser iniciado de forma moderna(C++ 11 adiante)</strong>; tu pode inicializar vectors com valores facilmente usando a braced inicialization <code>std::vector&lt;int&gt; v = { 1, 2, 3 };</code> como no C style array.</li>
+</ul>
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>vector<span class="pl-pds">&gt;</span></span>
+<span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">std</span><span class="pl-k">;</span>
+
+<span class="pl-k">void</span> <span class="pl-en">printContainer</span>(<span class="pl-k">const</span> vector&lt;<span class="pl-k">int</span>&gt;&amp; vec)
+{
+    <span class="pl-c"><span class="pl-c">//</span> vec.size() retorna o tamanho correto do vetor</span>
+    <span class="pl-c"><span class="pl-c">//</span> const type&amp; evita copias desnecessarias, ou seja, parametro passado por referencia </span>
+    
+    <span class="pl-c"><span class="pl-c">//</span> for simples</span>
+    <span class="pl-k">for</span>(<span class="pl-k">int</span> i = <span class="pl-c1">0</span>; i &lt; vec.<span class="pl-c1">size</span>(); i++)
+    {
+        cout &lt;&lt; vec[i] &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span><span class="pl-pds">"</span></span>;
+    }
+
+    <span class="pl-c"><span class="pl-c">//</span> for in range </span>
+    <span class="pl-k">for</span>(<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; elem : vec)
+    {
+        cout &lt;&lt; elem &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span><span class="pl-pds">"</span></span>;
+    }
+
+}
+
+<span class="pl-k">int</span> <span class="pl-en">main</span>()
+{
+
+    vector&lt;<span class="pl-k">int</span>&gt; <span class="pl-c1">vec1</span>(<span class="pl-c1">5</span>); <span class="pl-c"><span class="pl-c">//</span> comeca com 5 elem e todos iniciados como 0</span>
+    vector&lt;<span class="pl-k">int</span>&gt; vec2 = {<span class="pl-c1">10</span>, <span class="pl-c1">20</span>, <span class="pl-c1">30</span>}; <span class="pl-c"><span class="pl-c">//</span> direct initialization (C++11 adiante);</span>
+   
+    vec1 = vec2; <span class="pl-c"><span class="pl-c">//</span> vec1 eh uma copia exata de vec2, redimensionado automaticamente</span>
+
+    <span class="pl-c1">printContainer</span>(vec1);
+    
+    <span class="pl-k">return</span> <span class="pl-c1">0</span>;
+}
+</pre></div>
+<div class="markdown-heading"><h2 class="heading-element">Math Primer</h2><a id="user-content-math-primer" class="anchor" aria-label="Permalink: Math Primer" href="#math-primer"><span aria-hidden="true" class="octicon octicon-link"></span></a></div>
+<div class="markdown-heading"><h3 class="heading-element">Mathematical Induction</h3><a id="user-content-mathematical-induction" class="anchor" aria-label="Permalink: Mathematical Induction" href="#mathematical-induction"><span aria-hidden="true" class="octicon octicon-link"></span></a></div>
+<p><img src="images 1.png"/>
+Usando o exemplo de uma <strong>fileira infinita de dominos em pe</strong>, voce quer provar que <strong>todos</strong> os dominos vao cair, sem ter que derrubar e checar um por um, oq seria <strong>impossivel</strong> por serem <strong>infinitos</strong>.</p>
+<p>A <strong>inducao matematica</strong> diz que tu so precisa <strong>provar</strong> duas coisas pra garantir que <strong>todos</strong> os dominos caiam:</p>
+<ol>
+<li>
+<p><strong>Caso Base</strong> (Primeiro empurrao): Tu consegue <strong>provar</strong> que o <strong>primeiro</strong> domino cai?</p>
+</li>
+<li>
+<p><strong>Passo Indutivo</strong> (Regra da reacao em cadeia): Tu consegue <strong>provar</strong> que, <strong>se</strong> um domino <strong>qualquer</strong> cair, ele <strong>obrigatoriamente</strong> derrubara o <strong>proximo</strong>?</p>
+</li>
+</ol>
+<p>Se tu conseguir provar essas duas coisas, a "magica" acontece:</p>
+<ul>
+<li>O <strong>primeiro</strong> domino cai (tu provou isso);</li>
+<li>Como o <strong>primeiro</strong> domino caiu, a <strong>regra</strong> diz que o <strong>segundo</strong> tambem cai;</li>
+<li>Como o <strong>segundo</strong> domino caiu, a <strong>regra</strong> diz que o <strong>terceiro</strong> tambem cai;</li>
+<li>E assim por diante, pra sempre (<em>ad infinitum</em>), <strong>todos</strong> caem.</li>
+</ul>
+<p><img src="maxresdefault.jpg"/></p>
+<div class="markdown-heading"><h3 class="heading-element">1. Caso Base / Base Case</h3><a id="user-content-1-caso-base--base-case" class="anchor" aria-label="Permalink: 1. Caso Base / Base Case" href="#1-caso-base--base-case"><span aria-hidden="true" class="octicon octicon-link"></span></a></div>
+<p>tanto na matematica, como na recursao, tudo <strong>precisa</strong> de um <strong>ponto de partida</strong> e/ou de <strong>parada</strong>.</p>
+<ul>
+<li>No <strong>domino</strong>: eh teu dedo derrubando a <strong>primera peca</strong>
+</li>
+<li>Na <strong>matematica</strong>: eh provar que a <strong>formula</strong> <strong>funciona</strong> para o numero <strong>mais</strong> <strong>simples</strong>, geralmente o primeiro, 0 ou 1.</li>
+<li>Na <strong>programacao</strong>: eh o <code>if</code> que <strong>para</strong> a recursao.
+<ul>
+<li>ex: se tu faz uma funcao que conta regressivamente, o <strong>caso base</strong> eh <code>if (n == 0) return;</code>. Sem isso, o programa roda <strong>ad infinitum</strong>, ou ate travar :p</li>
+</ul>
+</li>
+</ul>
+<div class="markdown-heading"><h3 class="heading-element">2. Hipotese Indutiva / Inductive Hypothesis</h3><a id="user-content-2-hipotese-indutiva--inductive-hypothesis" class="anchor" aria-label="Permalink: 2. Hipotese Indutiva / Inductive Hypothesis" href="#2-hipotese-indutiva--inductive-hypothesis"><span aria-hidden="true" class="octicon octicon-link"></span></a></div>
+<p>pra provar que a regra funciona para todos os outros casos, voce diz:</p>
+<p><em>"Vamos <strong>assumir</strong> que a regra funciona para um numero qualquer $k$, se essa suposicao for verdade, eu consigo provar que funciona pra $k + 1$ (o proximo numero)?"</em></p>
+<p>tu nao ta assumindo que o resultado final eh verdadeiro, tu ta assumindo que a <strong>maquina/algoritmo</strong> <strong>funciona</strong>.</p>
+<ul>
+<li>
+<p><strong>ex da escada</strong>:
+A hipotese indutiva <strong>nao</strong> eh "eu consigo chegar ao topo".
+A hipotese eh "se eu tiver em <strong>qualquer</strong> degrau, digamos o degrau <code>5</code>, eu consigo subir pro degrau 6?"</p>
+<p>Se tu conseguir provar que consegue subir do degrau <code>5</code> para o <code>6</code> , e do <code>80</code> pro <code>81</code>, tu acabou de provar que a "passada"(<strong>algoritmo</strong>) funciona.
+Como tu ja provou que consegue subir no <strong>primeiro</strong> <strong>degrau</strong>(<strong>caso</strong> <strong>base</strong>), entao tu consegue subir a <strong>escada</strong> <strong>toda</strong>.</p>
+</li>
+</ul>
+<p><img src="Pasted image 20251203111542.png"/></p>
+<div class="markdown-heading"><h2 class="heading-element">Analise de algoritmos</h2><a id="user-content-analise-de-algoritmos" class="anchor" aria-label="Permalink: Analise de algoritmos" href="#analise-de-algoritmos"><span aria-hidden="true" class="octicon octicon-link"></span></a></div>
+<p>Agora que sabemos isso, podemos estudar o modo que o Weiss faz <strong>analise</strong> de <strong>algoritmos</strong>, que ocorre atraves do conceito de <strong>recursao</strong>, onde ele usa a <strong>inducao</strong> pra validar tanto a <strong>logica</strong> de um algoritmo quanto seu <strong>custo(tempo de execucao)</strong>.</p>
+<div class="markdown-heading"><h3 class="heading-element">Regra do design e provando a veracidade do algoritmo</h3><a id="user-content-regra-do-design-e-provando-a-veracidade-do-algoritmo" class="anchor" aria-label="Permalink: Regra do design e provando a veracidade do algoritmo" href="#regra-do-design-e-provando-a-veracidade-do-algoritmo"><span aria-hidden="true" class="octicon octicon-link"></span></a></div>
+<p>Segundo o manolo ai do livro, grande Weiss, entender <strong>inducao</strong> eh <strong>crucial</strong> pra entender <strong>recursao</strong>, e se tu tenta seguir o codigo linha por linha na tua cabeca, tu vai tontear negao.</p>
+<p>Por isso que a <strong>inducao</strong> nos da a <strong>regra do design</strong> pra recursao:</p>
+<p>"<strong>Assuma que todas as chamadas recursivas funcionam.</strong>"</p>
+<p>quando tu cria uma funcao recursiva, tu nao pode tentar simular oq o computador vai fazer, tu tem que usar a <strong>logica da inducao:</strong></p>
+<ol>
+<li>Eu tratei o <strong>caso base?</strong> (programa sabe quando parar?)</li>
+<li>Eu fiz o progresso em direcao ao caso base(<strong>passo indutivo</strong>)? (reduzi o problema grande em um menor e assumi que a funcao vai resolver esse menor corretamente?)</li>
+</ol>
+<p>ex <strong>fatorial</strong>:
+digamos que queremos calcular o fatorial de <strong>5</strong>: $5!(5 \times 4 \times 3 \times 2 \times 1)$.</p>
+<ul>
+<li>
+<p>logica <strong>sem inducao</strong>(jeito burro, vibe coder):
+"<code>5</code> vezes... espera, preciso saber <code>4!</code>"
+"<code>4</code> vezes... espera, preciso saber <code>3!</code>"
+"<code>3</code> vezes... espera, preciso saber <code>2!</code>"
+...
+(cerebro cansa, igual o computador)</p>
+</li>
+<li>
+<p>logica <strong>com inducao</strong>(10x engineer):</p>
+<ul>
+<li>Caso Base = o <code>fatorial(1)</code> eh <code>1</code>
+</li>
+<li>Hipotese = assumo que minha funcao sabe calcular o <code>fatorial(4)</code>.</li>
+<li>Passo Indutivo = entao, o  <code>fatorial(5)</code> eh apenas <code>5 * fatorial(4)</code>
+</li>
+</ul>
+</li>
+</ul>
+<p>se tu confia na hipotese(que a funcao sabe resolver o menor problema), a solucao do problema maior se torna obvia.</p>
+<div class="markdown-heading"><h3 class="heading-element">Da inducao pra analise de tempo/complexidade</h3><a id="user-content-da-inducao-pra-analise-de-tempocomplexidade" class="anchor" aria-label="Permalink: Da inducao pra analise de tempo/complexidade" href="#da-inducao-pra-analise-de-tempocomplexidade"><span aria-hidden="true" class="octicon octicon-link"></span></a></div>
+<p>quando tu vai analisar um algoritmo recursivo, tu nao pode simplesmente contar as linhas de codigo, pq o codigo eh executado repetidamente, gerando <strong>relacoes de recorrencia</strong> e a <strong>inducao</strong> eh a ferramenta matematica que tu usa pra resolver essas <strong>equacoes de recorrencia</strong> e provar o <strong>custo de execucao do algoritmo ($O$)</strong>, ou a famosa notacao *<em><em>Big</em> $O$</em>.</p>
+<p>ex do <strong>fibonacci</strong>:</p>
+<div class="highlight highlight-source-c++"><pre><span class="pl-k">long</span> <span class="pl-en">fib</span>( <span class="pl-k">int</span> n ) 
+{
+    <span class="pl-k">if</span>( n &lt;= <span class="pl-c1">1</span> )
+    {
+        <span class="pl-k">return</span> <span class="pl-c1">1</span>; <span class="pl-c"><span class="pl-c">//</span> Caso base</span>
+    } <span class="pl-k">else</span> {
+        <span class="pl-k">return</span> <span class="pl-c1">fib</span>( n - <span class="pl-c1">1</span> ) + <span class="pl-c1">fib</span>( n - <span class="pl-c1">2</span> ); <span class="pl-c"><span class="pl-c">//</span> Passo indutivo/recursivo</span>
+    }
+}</pre></div>
+<p>e essa seria o flow de analise do algoritmo fibonacci:</p>
+<ul>
+<li>
+<p><strong>O</strong> <strong>problema</strong> (Compound Interest Rule):
+Pra calcular <code>fib(5)</code> o computador calcula <code>fib(4)</code> e <code>fib(3)</code>, porem, dentro do <code>fib(4)</code>, ele calcula o <code>fib(3)</code> <strong>de novo</strong>.
+Tu ta literalmente refazendo o mesmo trabalho dnv, o mano Weiss fala que isso eh violar a <strong>Compound Interest Rule</strong> (regra dos juros compostos), ou seja, tu ta pagando juros sobre juros de processamento, resolvendo o mesmo problema varias vezes.</p>
+</li>
+<li>
+<p><strong>A matematica dessa lentidao:</strong>
+se tu desenhar a arvore de chamadas, ou a <strong>stack</strong>, vai ver que o tempo $T(N)$ pra calcular cresce quase na mesma velocidade que o valor do numero fibonacci.
+Como os numeros fibonacci crescem de forma <strong>exponencial</strong> (multiplicando por volta de $1,618$ a cada passo), o tempo tambem cresce assim.
+Se $N = 40$, demora pra crl.
+Se $N = 100$, o sol vai apagar antes do programa terminar.</p>
+</li>
+</ul>
+<div class="markdown-heading"><h3 class="heading-element">Notacoes matematicas</h3><a id="user-content-notacoes-matematicas" class="anchor" aria-label="Permalink: Notacoes matematicas" href="#notacoes-matematicas"><span aria-hidden="true" class="octicon octicon-link"></span></a></div>
+<p>pra nos nao parecermos uns lerdoes chutando "ah, esse eh rapido" ou "esse eh lento", a gente usa umas notacoes matematicas pra classificar o comportamento do algoritmo quando $N$ (tamanho do input) fica <strong>gigante</strong>.</p>
+<ol>
+<li>Big $O$ -&gt; Teto (Limite superior/upper bound)
+<ul>
+<li>Definicao: Garantia de que o algoritmo <strong>nao vai ser pior</strong> que isso.</li>
+<li>Eh o "menor ou igual" ($\leq$) das funcoes.</li>
+<li>Se eu digo que um algoritmo eh $O(N^2)$, eu to prometendo que o tempo de execucao dele nao cresce mais rapido que uma parabola. Pode ser mais rapido (linear), mas nunca mais lento.</li>
+<li>No fibonacci, o algoritmo recursivo eh $O(2^N)$, ou seja, isso garante que ele nao cresce mais rapido que $2^N$.</li>
+</ul>
+</li>
+<li>Omega ($\Upomega$) -&gt; Chao (Limite inferior/lower bound)
+<ul>
+<li>Definicao: Garantia de que o algoritmo vai demorar <strong>pelo menos</strong> isso.</li>
+<li>Eh o "maior ou igual" ($\geq$)</li>
+<li>Serve pra provar q o algoritmo eh pesado mesmo. Nao importa o PC da NASA q tu use, o numero de operacoes minimas bate nesse limite</li>
+<li>No fibonacci, o Weiss prova por inducao que o tempo eh $\Upomega(\left( \frac{3}{2} \right)^N)$, ou seja, ele cresce pelo menos tao rapido quando $1.5^N$. Isso prova matematicamente que a abordagem recursiva eh inviavel pra numeros grandes.</li>
+</ul>
+</li>
+</ol>
+</body>
+</html>
