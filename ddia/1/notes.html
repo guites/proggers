@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Site do proggers bookclub">
+    <meta name="keywords" content="programming, programação, clube do livro, bookclub">
+    <link rel="stylesheet" href="../../holiday.css">
+    <title>Proggers Bookclub</title>
+    <style>
+        h2:target::before {
+            content: ">> ";
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Notas do primeiro encontro (08/04/2026)</h1>
+    <p><strong>Livro:</strong> <em>Designing Data-Intensive Applications</em><br />
+    <strong>Capítulo discutido:</strong> Capítulo 1 - <em>Reliable, Scalable and Maintainable Applications</em><br />
+    <strong>Data da reunião:</strong> 8 de abril de 2026</p>
+    <hr/>
+    <p><strong>Aviso:</strong> Este resumo foi gerado por IA usando como entrada o áudio transcrito da reunião.</p>
+    <details><summary>Prompt utilizado</summary>
+    <pre><code>Me ajude a gerar um relatório desta reunião de estudos que teve como foco
+discussão do capitulo 1 (Reliable, Scalable and maintanable Applications) do
+livro Designing Data Intensive Applications.
+
+A transcrição está no arquivo "transcript.txt" no diretório atual.
+
+Você deve criar um documento com os seguintes pontos:
+
+1. Resumo (cerca de 300 palavras)
+2. Principais tópicos debatidos (até 10)
+3. Principais questões levantadas (ex. "Como gerenciar rollback em sistemas
+com muitos usuários?")
+4. Exemplos utilizados para ilustrar os conceitos abordados (tanto exemplo
+presentes no livro quanto exemplos tragos do dia a dia profissional
+dos participantes)</code></pre>
+    </details>
+    <hr/>
+    <h2>1. Resumo</h2>
+    <p>A reunião concentrou-se na ideia central de que, em grande parte dos sistemas
+    modernos, o principal desafio arquitetural não está no processamento em si, mas
+    no gerenciamento dos dados e do estado da aplicação. Os participantes destacaram
+    que aplicações reais costumam ser muito mais <em>data-intensive</em> do que
+    <em>compute-intensive</em>, o que muda a forma como problemas de performance e arquitetura
+    devem ser analisados. A discussão começou com a observação de que paralelizar
+    processamento costuma ser relativamente simples, enquanto manter consistência,
+    estado compartilhado e integridade dos dados é a parte mais difícil.</p>
+    <p>Com base nisso, o grupo explorou a introdução do capítulo e a proposta do
+    livro: tratar bancos de dados, caches e filas como tecnologias de armazenamento
+    e processamento de informação que, embora frequentemente separadas no discurso
+    técnico, compartilham responsabilidades estruturais importantes. Também foi
+    debatida a ideia de que o banco de dados é uma abstração extremamente bem-sucedida,
+    ainda que sua abstração &quot;vaze&quot; quando precisamos otimizá-lo com mais profundidade.</p>
+    <p>Na parte de confiabilidade, os participantes discutiram a diferença entre falhas
+    localizadas em componentes e falhas sistêmicas, além das categorias de falhas
+    de hardware, software e erro humano. Surgiram exemplos práticos como timeout em
+    integrações lentas, consultas pesadas, falhas em cascata entre serviços e
+    dificuldades para lidar com rollback e consistência histórica.</p>
+    <p>Em escalabilidade, o foco ficou no conceito de carga (<em>load</em>) e em como cada sistema
+    deve medi-la de forma específica, como requisições por segundo, leituras e
+    escritas, ou usuários simultâneos. A conversa também trouxe a distinção entre
+    escalabilidade e elasticidade, enfatizando que escalar não basta: é importante
+    conseguir absorver aumento de carga com rapidez e custo adequado.</p>
+    <p>Por fim, a manutenibilidade foi apresentada de forma mais breve, associada à
+    facilidade de operar, simplificar e evoluir o sistema ao longo do tempo,
+    especialmente por meio de desacoplamento e modularização.</p>
+    <h2>2. Principais tópicos debatidos</h2>
+    <ol>
+    <li>Diferença entre aplicações <em>data-intensive</em> e <em>compute-intensive</em>.</li>
+    <li>Dados e estado compartilhado como principal fonte de complexidade arquitetural.</li>
+    <li>Banco de dados como abstração central e bem-sucedida da computação moderna.</li>
+    <li>Relação entre banco de dados, cache e fila como formas de armazenamento de informação.</li>
+    <li>Confiabilidade como capacidade do sistema de continuar operando corretamente
+    mesmo diante de falhas.</li>
+    <li>Diferença entre falha de componente e falha de sistema.</li>
+    <li>Tipos de falhas: hardware, software e erro humano.</li>
+    <li>Escalabilidade a partir do conceito de carga (<em>load</em>) e seus diferentes indicadores.</li>
+    <li>Diferença entre escalabilidade e elasticidade.</li>
+    <li>Manutenibilidade como facilidade de operar, simplificar e evoluir o sistema.</li>
+    </ol>
+    <h2>3. Principais questões levantadas</h2>
+    <ul>
+    <li>Como gerenciar rollback em sistemas com muitos usuários e com histórico de
+    dados já alterado?</li>
+    <li>Como manter consistência quando há grande volume de dados, múltiplos serviços
+    e dependências compartilhadas?</li>
+    <li>Em que momento vale introduzir redundância de dados para ganhar performance?</li>
+    <li>Como equilibrar normalização e desnormalização em bancos de dados que
+    precisam escalar?</li>
+    <li>Como otimizar banco de dados sem depender excessivamente de detalhes internos
+    da tecnologia?</li>
+    <li>Como projetar sistemas que resistam a timeout, lentidão de integrações e
+    falhas em cascata?</li>
+    <li>Como medir corretamente a carga de um sistema, considerando que cada tipo de
+    aplicação exige métricas diferentes?</li>
+    <li>Como preparar uma aplicação para picos repentinos de uso sem desperdiçar infraestrutura?</li>
+    <li>Até que ponto a responsabilidade por confiabilidade deve existir mesmo em
+    POCs e MVPs?</li>
+    <li>Como estruturar módulos para permitir evolução futura sem alto acoplamento?</li>
+    </ul>
+    <h2>4. Exemplos utilizados para ilustrar os conceitos abordados</h2>
+    <h3>Exemplos citados do livro ou associados diretamente à discussão do capítulo</h3>
+    <ul>
+    <li>O caso do Twitter foi usado para discutir decisões entre consultar dados
+    diretamente ou usar cache, dependendo do perfil de acesso.</li>
+    <li>O exemplo de sistemas que primeiro consultam o cache e só depois recorrem ao
+    banco de dados foi usado para mostrar cache como forma de armazenamento
+    temporário relevante para arquitetura.</li>
+    <li>A distinção entre falha de componente e falha sistêmica foi ilustrada com o
+    caso em que o cache falha, mas o sistema continua funcionando porque ainda
+    consegue consultar o banco.</li>
+    <li>O exemplo de grandes datacenters com muitas máquinas foi mencionado para
+    mostrar que falhas de hardware são inevitáveis estatisticamente e devem ser tratadas com redundância.</li>
+    </ul>
+    <h3>Exemplos trazidos da prática profissional e do dia a dia dos participantes</h3>
+    <ul>
+    <li>Discussão sobre rollback de dados antigos em sistemas com muitos usuários,
+    especialmente quando é necessário recuperar o estado de dias anteriores.</li>
+    <li>Relato sobre normalização e posterior desnormalização de banco de dados
+    para equilibrar corretude e performance.</li>
+    <li>Exemplo de tabela redundante ou contador de likes para evitar <em>joins</em> custosos
+    e acelerar leituras.</li>
+    <li>Caso de monitoramento com Zabbix em infraestrutura crítica, com alarmes e
+    ações automáticas para mitigar problemas de hardware, como expurgo de logs.</li>
+    <li>Exemplo de endpoint lento que faz consultas pesadas e acaba causando timeout
+    no front-end e indisponibilidade percebida pelo usuário.</li>
+    <li>Caso real de integração com Airtable em Cloudflare Workers, em que a
+    latência da consulta fazia a execução estourar o limite do ambiente.</li>
+    <li>Exemplo de fila acumulando processamento e gerando perda de consistência
+    temporal entre produção e consumo dos dados.</li>
+    <li>Comparação com renderização gráfica, em que um objeto complexo atrasa toda
+    a fila de processamento.</li>
+    <li>Exemplo do uso de SQLite em cenários com muita leitura e pouca escrita, contrastando
+    com contextos em que muitas escritas simultâneas exigem outra estratégia.</li>
+    <li>Caso do crescimento repentino do &quot;Koo&quot;, citado para ilustrar como picos de carga
+    podem derrubar uma aplicação despreparada e desperdiçar uma janela de adoção.</li>
+    </ul>
+</body>
