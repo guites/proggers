@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Site do proggers bookclub">
+    <meta name="keywords" content="programming, programação, clube do livro, bookclub">
+    <link rel="stylesheet" href="../../holiday.css">
+    <title>Proggers Bookclub</title>
+    <style>
+        h2:target::before {
+            content: ">> ";
+        }
+    </style>
+</head>
+
+<body>
+	<header>
+		<p style="margin-bottom: 0px;">
+			<a href="https://guites.github.io/proggers/">
+				<img width="25" height="36.5" src="../../Poggers-res.png"/>
+				<strong>Proggers Bookclub</strong>
+				<img width="25" height="36.5" src="../../Poggers-flop.png"/>
+			</a>
+		</p>
+		<p style="margin-top: 0px;">
+			Clube do livro de programação.
+		</p>
+		<p style="margin-top: 0px;"><small>abra um pr para editar essa pagina: <a href="https://github.com/guites/proggers">github.com/guites/proggers</a>.</small></p>
+	</header>
+<h1>Material do segundo encontro (15/04/2026)</h1>
+<p><strong>Livro:</strong> <em>Designing Data-Intensive Applications</em><br />
+<strong>Capítulo discutido:</strong> Capítulo 2 - <em>Data models and Query Languages</em><br />
+<strong>Data da reunião:</strong> 15 de abril de 2026</p>
+<hr/>
+<p>Este foi o material usado para guiar a reunião. O resumo se encontra em <a href="https://guites.github.io/proggers/ddia/2/notes.html">https://guites.github.io/proggers/ddia/2/notes.html</a>.</p>
+<h2 id="data-modelling">Data Modelling</h2>
+<blockquote>
+<p>“The limits of my language mean the limits of my world.” ​ ​ ​ ​ ​ ​ ​ ​ ​ ​ ​ ​ ​
+​​​​​Wittgenstein</p>
+</blockquote>
+<ul>
+<li>Data models are layers of abstraction.</li>
+<li>Each layer hides complexity of the one below: App objects -&gt; Data
+model (JSON/tables/graph) -&gt; Bytes on disk -&gt; Hardware</li>
+</ul>
+<p>Choice of data model shapes how you <strong>think</strong> about the
+problem.</p>
+<p>Most applications are built by layering one data model on top of
+another, and usually a common question is: <em>how is it represented in
+terms of the next-lower layer?</em></p>
+<ol type="1">
+<li><p><strong>Your brain</strong> <strong>Layer</strong> ​​“I need to
+store the user name, email and age” you are only thinking about the
+<em>problem</em> now</p></li>
+<li><p><strong>The data model</strong> <strong>layer</strong> ​ Then
+you/or a developer translate the data structures into something a
+computer can organize, like ​an spreadsheet, JSON files, XML docs or even
+just PODs</p></li>
+<li><p><strong>The database layer</strong> ​ ​ The database you select to
+use, gets the data in those formats and figures out how to store it
+efficiently, or, how to represent that data as bytes in memory, disks or
+over the internet.</p></li>
+<li><p><strong>The hardware layer</strong> ​ ​The computer turns all of
+that into actual electrical signals, ones and zeros on a chip or disk,
+also is the only layer that thinks about electricity.</p></li>
+</ol>
+        <h3 id="game-engine-example">Game Engine Example</h3>
+<p>[[Game Engine Architecture Vol I..pdf]]</p>
+<blockquote>
+<p>[!cite] About Layers Like all software systems, game engines are
+built in layers. Normally upper layers depend on lower layers, but not
+vice versa. When a lower layer depends upon a higher layer, we call this
+a <em>circular dependency.</em></p>
+<p>Dependency cycles are to be avoided in any software system, because
+they lead to undesirable coupling between system make the software
+untestable and inhibit code reuse. This is especially true for a
+large‑scale system like a game engine.</p>
+</blockquote>
+<blockquote>
+<p>[!Cite] About data and assets “Game engines deal with a wide range of
+asset types, from renderable geometry to materials and textures to
+animation data to audio. These assets are defined in part by the raw
+data produced by the artists when they use a tool like Maya, Photoshop
+or SoundForge.</p>
+<p>Every game engine requires some kind of database to manage all of the
+metadata associated with the game’s assets. This database might be
+implemented using an honest‑to‑goodness relational database such as
+MySQL or Oracle, or it might be implemented as a collection of text
+files, managed by a revision control system such as Subversion, Perforce
+or Git. We’ll call this metadata the resource database in this book.</p>
+<p>No matter in what format the resource database is stored and managed,
+some kind of user interface must be provided to allow users to author
+and edit the data. At Naughty Dog, we wrote a custom GUI in C# called
+Builder for this purpose.”</p>
+</blockquote>
+        <h3 id="relational-vs-document">Relational Vs Document</h3>
+<p><strong>Impedance Mismatch</strong>: friction between two ways of
+describing the same information.</p>
+<p>“descoordenação” entre o modelo mental do programa e o modelo de
+armazenamento do banco</p>
+<p>Your program = objects, linked lists, types, inheritence etc</p>
+<p>Your database = tables, rows and columns</p>
+<p>exemplo:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> Item <span class="op">{</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>string nome<span class="op">;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">double</span> preco<span class="op">;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> quantidade<span class="op">;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> Pedido <span class="op">{</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> id<span class="op">;</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>string cliente<span class="op">;</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>vector<span class="op">&lt;</span>Item<span class="op">&gt;</span> itens<span class="op">;</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span></code></pre></div>
+<p>tabela pedidos:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">id</span> | cliente</span></code></pre></div>
+<p>tabela itens_pedido:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">id</span> | pedido_id | nome | preco | quantidade</span></code></pre></div>
+<p>salvar um <code>Pedido</code>:</p>
+<ol type="1">
+<li>inserir na table <code>pedidos</code></li>
+<li>pega <code>id</code></li>
+<li>pra cada item:
+<ul>
+<li>insere em <code>itens_pedido</code> com <code>pedido_id</code></li>
+</ul></li>
+</ol>
+<p>carregar um <code>Pedido</code>:</p>
+<ol type="1">
+<li>busca o pedido</li>
+<li>busca todos os itens com <code>pedido_id</code></li>
+<li>reconstroi <code>vector&lt;Item&gt;</code></li>
+</ol>
+<p>ou seja, constantemente:</p>
+<ul>
+<li>desmontando objetos em linhas</li>
+<li>remontando linhas em objetos</li>
+</ul>
+<p><strong>Problema:</strong></p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">std::</span>vector<span class="op">&lt;</span>Pedido<span class="op">&gt;</span> pedidos <span class="op">=</span> carregarPedidos<span class="op">();</span></span></code></pre></div>
+<p>isso por baixo dos panos roda:</p>
+<ol type="1">
+<li>query para pegar os pedidos:</li>
+</ol>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="kw">id</span>, cliente <span class="kw">FROM</span> pedidos;</span></code></pre></div>
+<p>e digamos que isso retorne ~100 pedidos</p>
+<p>entao pra cada pedido, essa query vai rodar 1x:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> nome, preco, quantidade </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> itens_pedido </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> pedido_id <span class="op">=</span> X;</span></code></pre></div>
+<p>ou seja,</p>
+<p>1 query inicial + 100 queries = 101 queries = N+1</p>
+<p>entao se:</p>
+<ul>
+<li>cada query: ~5ms</li>
+<li>101 queries: ~505ms</li>
+</ul>
+<p><strong>Relational</strong> (SQL, since the 70s) won because it hid
+the messy storage stuff and let people just declare what they
+wanted.</p>
+<p>It assumed data is <em>rows</em> in <em>tables</em> with
+relationships between them via <em>foreign</em> <em>keys</em>.</p>
+<p><strong>Document</strong> <strong>databases</strong> (aka noSQL)
+(MongoDB, CouchDB, etc.) came back into fashion because:</p>
+<ol type="1">
+<li>Devs wanted JSON-shaped data that matches their objects</li>
+<li>Schemas felt rigid.</li>
+<li>Better locality, one document, one disk read.</li>
+<li>Some apps have tree-shaped data and joins felt dumb for that.</li>
+</ol>
+<p>A person has a name, a job history (list), an education list, contact
+info. In a document DB you just store the whole résumé as one JSON blob:
+[[Pasted image 20260415093248.png]] [[Pasted image
+20260415093248.png|322]]</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode json"><code class="sourceCode json"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;user_id&quot;</span><span class="fu">:</span> <span class="dv">251</span><span class="fu">,</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;first_name&quot;</span><span class="fu">:</span> <span class="st">&quot;Bill&quot;</span><span class="fu">,</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;last_name&quot;</span><span class="fu">:</span> <span class="st">&quot;Gates&quot;</span><span class="fu">,</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;positions&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;job_title&quot;</span><span class="fu">:</span> <span class="st">&quot;Co-chair&quot;</span><span class="fu">,</span> <span class="dt">&quot;organization&quot;</span><span class="fu">:</span> <span class="st">&quot;Bill &amp; Melinda Gates Foundation&quot;</span><span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;job_title&quot;</span><span class="fu">:</span> <span class="st">&quot;Co-founder&quot;</span><span class="fu">,</span> <span class="dt">&quot;organization&quot;</span><span class="fu">:</span> <span class="st">&quot;Microsoft&quot;</span><span class="fu">}</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;education&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span><span class="dt">&quot;school_name&quot;</span><span class="fu">:</span> <span class="st">&quot;Harvard University&quot;</span><span class="fu">,</span> <span class="dt">&quot;start&quot;</span><span class="fu">:</span> <span class="dv">1973</span><span class="fu">,</span> <span class="dt">&quot;end&quot;</span><span class="fu">:</span> <span class="dv">1975</span><span class="fu">}</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<p>In SQL you’d shred that into a <code>users</code> table, a
+<code>positions</code> table, an <code>education</code> table, and join
+them back together. The document version has nice locality (one fetch,
+all the data). The SQL version is better when many people share the same
+data, like if “Microsoft” is its own entity that 10,000 résumés point
+to. Update the company name once, everyone sees it. In the document
+version you’d have to find every résumé and update it.</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- tables</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> users (</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  user_id     <span class="dt">INTEGER</span> <span class="kw">PRIMARY</span> <span class="kw">KEY</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  first_name  TEXT,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  last_name   TEXT</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>);</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> organizations (</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  org_id  <span class="dt">INTEGER</span> <span class="kw">PRIMARY</span> <span class="kw">KEY</span>,</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  name    TEXT</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>);</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> schools (</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  school_id  <span class="dt">INTEGER</span> <span class="kw">PRIMARY</span> <span class="kw">KEY</span>,</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>  name       TEXT</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>);</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> positions (</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>  position_id  <span class="dt">INTEGER</span> <span class="kw">PRIMARY</span> <span class="kw">KEY</span>,</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>  user_id      <span class="dt">INTEGER</span> <span class="kw">REFERENCES</span> users(user_id),</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>  org_id       <span class="dt">INTEGER</span> <span class="kw">REFERENCES</span> organizations(org_id),</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>  job_title    TEXT</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>);</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> education (</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>  education_id  <span class="dt">INTEGER</span> <span class="kw">PRIMARY</span> <span class="kw">KEY</span>,</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>  user_id       <span class="dt">INTEGER</span> <span class="kw">REFERENCES</span> users(user_id),</span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>  school_id     <span class="dt">INTEGER</span> <span class="kw">REFERENCES</span> schools(school_id),</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>  start_year    <span class="dt">INTEGER</span>,</span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>  end_year      <span class="dt">INTEGER</span></span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>);</span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a><span class="co">-- data</span></span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a><span class="kw">INSERT</span> <span class="kw">INTO</span> users <span class="kw">VALUES</span> (<span class="dv">251</span>, <span class="st">&#39;Bill&#39;</span>, <span class="st">&#39;Gates&#39;</span>);</span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a><span class="kw">INSERT</span> <span class="kw">INTO</span> organizations <span class="kw">VALUES</span></span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>  (<span class="dv">1</span>, <span class="st">&#39;Bill &amp; Melinda Gates Foundation&#39;</span>),</span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>  (<span class="dv">2</span>, <span class="st">&#39;Microsoft&#39;</span>);</span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a><span class="kw">INSERT</span> <span class="kw">INTO</span> schools <span class="kw">VALUES</span></span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>  (<span class="dv">1</span>, <span class="st">&#39;Harvard University&#39;</span>);</span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a><span class="kw">INSERT</span> <span class="kw">INTO</span> positions <span class="kw">VALUES</span></span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>  (<span class="dv">1</span>, <span class="dv">251</span>, <span class="dv">1</span>, <span class="st">&#39;Co-chair&#39;</span>),</span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>  (<span class="dv">2</span>, <span class="dv">251</span>, <span class="dv">2</span>, <span class="st">&#39;Co-founder&#39;</span>);</span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a><span class="kw">INSERT</span> <span class="kw">INTO</span> education <span class="kw">VALUES</span></span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a>  (<span class="dv">1</span>, <span class="dv">251</span>, <span class="dv">1</span>, <span class="dv">1973</span>, <span class="dv">1975</span>);</span></code></pre></div>
+<p>One JSON blob became 5 tables and 7 inserts.</p>
+<p>To get the résumé back you do a join:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> u.first_name, u.last_name, p.job_title, o.name <span class="kw">AS</span> <span class="kw">organization</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> users u</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="kw">LEFT</span> <span class="kw">JOIN</span> positions p     <span class="kw">ON</span> p.user_id <span class="op">=</span> u.user_id</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="kw">LEFT</span> <span class="kw">JOIN</span> organizations o <span class="kw">ON</span> o.org_id  <span class="op">=</span> p.org_id</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> u.user_id <span class="op">=</span> <span class="dv">251</span>;</span></code></pre></div>
+<h2 id="many-to-one-many-to-many">Many-to-one &amp; Many-to-many</h2>
+<p>To determine relationships in SQL:</p>
+<p><strong>One-to-Many</strong> (1:N): One entity instance relates to
+many instances of another entity.</p>
+<pre><code>
+one user  ─────────&gt;  many positions
+(Bill)           (Co-founder at MS, Co-chair at Gates Foundation)
+
+users                          positions
+┌─────────┬──────┐             ┌─────────┬───────────────┐
+│ user_id │ name │             │ user_id │   job_title   │
+├─────────┼──────┤             ├─────────┼───────────────┤
+│   251   │ Bill │ &lt;────────── │   251   │  Co-founder   │
+└─────────┴──────┘    &lt;─────── │   251   │   Co-chair    │
+                               │   251   │   Trustee     │
+                               └─────────┴───────────────┘</code></pre>
+<p>Bill has 3 positions. Each position belongs to exactly one Bill.
+One-to-many.</p>
+<p><strong>Many-to-One</strong> (N:1): Many instances of one entity
+relate to one instance of another entity. Same relationship, looked at
+from the other side. Many rows in B point at one row in A.</p>
+<pre><code>many positions  ─────────&gt;  one organization
+(Bill&#39;s job, Linus&#39;s job)    (Microsoft)
+
+positions                      organizations
+┌─────────┬────────┐           ┌────────┬───────────┐
+│ user_id │ org_id │           │ org_id │   name    │
+├─────────┼────────┤           ├────────┼───────────┤
+│   251   │   1    │ ─────────&gt;│   1    │ Microsoft │
+│   252   │   1    │ ─────────&gt;│        │           │
+│   253   │   1    │ ─────────&gt;│        │           │
+└─────────┴────────┘           └────────┴───────────┘</code></pre>
+<p>Many positions, one Microsoft. “One-to-many” and “many-to-one” are
+literally the same rela=-tionship, you just pick which side you’re
+standing on.</p>
+<p><strong>Many-to-Many</strong> (N:M): Many instances of one entity
+relate to many instances of another entity. Both sides can have many of
+the other. A student takes many courses, a course has many students.
+Neither side “owns” the other.</p>
+<pre><code>students                  enrollments               courses
+┌────────────┬──────┐    ┌────────────┬───────────┐    ┌───────────┬─────────┐
+│ student_id │ name │    │ student_id │ course_id │    │ course_id │  title  │
+├────────────┼──────┤    ├────────────┼───────────┤    ├───────────┼─────────┤
+│     1      │ Ada  │ ◄──│     1      │    101    │───►│    101    │  Math   │
+│     2      │ Bob  │ ◄──│     1      │    102    │───►│    102    │ Physics │
+└────────────┴──────┘ ◄──│     2      │    101    │───►└───────────┴─────────┘
+                         └────────────┴───────────┘</code></pre>
+<p>You can’t represent this with one foreign key, you will need a third
+table in the middle, called a <strong>join table</strong>.</p>
+<p><strong>This is the core trade-off:</strong></p>
+<ol type="1">
+<li>if the thing has its own identity and other things reference it, it
+deserves its own table.</li>
+<li>If the thing only exists as part of its parent and nobody else cares
+about it, stuff it inside the parent as a document.</li>
+</ol>
+<p>TLDR:</p>
+<p>[[Pasted image 20260415100707.png|116]]</p>
+<ul>
+<li><strong>One-to-many, tree-shaped, read together</strong> = document
+wins.</li>
+<li><strong>Many-to-one or many-to-many, shared entities</strong> =
+relational wins.</li>
+</ul>
+<h2 id="tree-shaped">Tree-shaped</h2>
+<p>Tree-shaped means the data branches downward and never loops back to
+itself.</p>
+<pre><code>              Resume (Bill)
+                  │
+        ┌─────────┼──────────┐
+    Positions  Education  Contact info
+        │          │
+    ┌───┴───┐      │
+   Job1    Job2  Harvard</code></pre>
+<p>Each thing has one parent. Nothing points sideways. Nothing points
+back up.</p>
+<p>A document database is basically storing the whole tree as one nested
+blob:</p>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode json"><code class="sourceCode json"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;name&quot;</span><span class="fu">:</span> <span class="st">&quot;Bill&quot;</span><span class="fu">,</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;positions&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="fu">{</span><span class="er">...</span><span class="fu">}</span><span class="ot">,</span> <span class="fu">{</span><span class="er">...</span><span class="fu">}</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;education&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="fu">{</span><span class="er">...</span><span class="fu">}</span><span class="ot">]</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<p>If your data is shaped like a tree, this is great. One read gets the
+whole thing.</p>
+<p>But the moment your data stops being a tree, or the moment one node
+needs to point at another node that lives in a different tree, you’re
+not in tree territory anymore. You’re in <strong>graph</strong>
+territory. That’s when you start needing foreign keys, join tables, or
+an actual graph database.</p>
+<pre><code>Tree:​  ​​                       Not a tree (graph):
+
+      A                                  A ──&gt; B
+     / \                                 │     │
+    B   C                                v     v
+   / \                                   C &lt;── D
+  D   E                                  │
+                                         └──&gt; A   &lt;- loops back</code></pre>
+</body>

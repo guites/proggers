@@ -1,0 +1,126 @@
+    <h1>Notas do segundo encontro (15/04/2026)</h1>
+    <p><strong>Livro:</strong> <em>Designing Data-Intensive Applications</em><br />
+    <strong>Capítulo discutido:</strong> Capítulo 2 - <em>Data models and Query Languages</em><br />
+    <strong>Data da reunião:</strong> 15 de abril de 2026</p>
+    <hr/>
+    <p><strong>Aviso:</strong> Este resumo foi gerado por IA usando como entrada o áudio transcrito da reunião.</p>
+    <details><summary>Prompt utilizado</summary>
+    <pre><code>Me ajude a gerar um relatório desta reunião de estudos que teve como foco
+discussão do capitulo 2 (Data models and Query Languages) do
+livro Designing Data Intensive Applications.
+
+A transcrição está no arquivo "transcript.txt" no diretório atual.
+
+Você deve criar um documento com os seguintes pontos:
+
+1. Resumo (cerca de 300 palavras)
+2. Principais tópicos debatidos (até 10)
+3. Principais questões levantadas (ex. "Como gerenciar rollback em sistemas
+com muitos usuários?")
+4. Exemplos utilizados para ilustrar os conceitos abordados (tanto exemplo
+presentes no livro quanto exemplos tragos do dia a dia profissional
+dos participantes)</code></pre>
+    </details>
+    <hr/>
+<h2 id="1-resumo-cerca-de-300-palavras">1. Resumo</h2>
+<p>A reunião discutiu como os modelos de dados são organizados em
+camadas e como cada camada abstrai a complexidade da camada inferior. O
+grupo começou pela ideia de modelar o problema no domínio (ex.: sistema
+de estudantes), depois converter para estruturas manipuláveis pelo
+computador (JSON, CSV, structs), em seguida escolher o modelo e
+mecanismo de persistência, e por fim considerar os níveis mais baixos de
+armazenamento e execução. Foi reforçada a importância de manter
+independência entre camadas e evitar dependências circulares.</p>
+<p>Na sequência, o debate central foi a escolha entre bancos
+relacionais, documentais (NoSQL) e, mais adiante, grafos. Um ponto
+recorrente foi que a decisão não deve ser guiada apenas por “ter
+relacionamento ou não”, mas principalmente por padrão de acesso aos
+dados. O grupo usou o contraste entre modelos orientados a objeto e
+tabelas relacionais para explicar o <em>impedance mismatch</em> e o
+risco de consultas N+1 quando a consulta é mal estruturada.</p>
+<p>Também foi discutido que NoSQL não significa “sem SQL”, mas “Not Only
+SQL”, e que na prática muitos sistemas misturam abordagens (ex.:
+PostgreSQL com JSONB). Surgiram trade-offs claros: documentos favorecem
+localidade dos dados e leitura agregada de entidades; relacionais
+favorecem normalização, consistência e consultas declarativas otimizadas
+pelo motor do banco. Em cenários com muitos relacionamentos
+(especialmente N:N), o grupo observou que o modelo documental pode
+perder eficiência e clareza, exigindo agregações e junções mais manuais
+na aplicação.</p>
+<p>No trecho final, a conversa avançou para grafos: nós, arestas,
+múltiplos tipos de relacionamento e linguagens declarativas específicas
+(como Cypher), com comparação ao custo de simular grafos em SQL puro.
+Como encaminhamento, foi sugerido montar um laboratório prático para
+comparar performance, ergonomia de consulta e aderência à regra de
+negócio entre modelos relacional, documental e grafo.</p>
+<h2 id="2-principais-tópicos-debatidos-até-10">2. Principais tópicos debatidos</h2>
+<ol type="1">
+<li>Modelagem em camadas: domínio -&gt; representação -&gt;
+armazenamento -&gt; nível físico.</li>
+<li>Independência entre camadas e risco de dependência circular.</li>
+<li>Diferença entre modelagem orientada a objeto e modelagem
+relacional.</li>
+<li>Problema N+1 e impacto de consultas mal desenhadas.</li>
+<li>Relacional vs documental com foco em padrão de acesso aos
+dados.</li>
+<li>Normalização vs duplicação e “fonte única da verdade”.</li>
+<li>Localidade de dados (documentos) vs distribuição em múltiplas
+tabelas.</li>
+<li>Evolução de esquema: flexibilidade no documento vs rigidez
+controlada no relacional.</li>
+<li>Limites do modelo documental em relacionamentos complexos
+(especialmente N:N).</li>
+<li>Modelagem e consulta em grafos (nós/arestas, traversal e linguagens
+declarativas como Cypher).</li>
+</ol>
+<h2 id="3-principais-questões-levantadas">3. Principais questões
+levantadas</h2>
+<ul>
+<li>Como decidir entre relacional, documental e grafo sem se limitar ao
+critério “tem relacionamento”?</li>
+<li>Quando a busca por normalização compensa mais do que ganho de
+leitura por localidade?</li>
+<li>Em que ponto um modelo documental perde eficiência por excesso de
+referências e junções na aplicação?</li>
+<li>Como evitar o problema N+1 ao mapear objetos para tabelas
+relacionais?</li>
+<li>Até onde vale manter esquema flexível antes de gerar inconsistência
+de dados?</li>
+<li>Qual a diferença prática entre representar relações complexas em SQL
+vs usar banco de grafos?</li>
+<li>Como modelar relações N:N de forma sustentável em sistemas que
+crescem rápido?</li>
+<li>Quais ganhos reais de desempenho e manutenção em adotar consultas
+declarativas específicas de grafo?</li>
+</ul>
+<h2 id="4-exemplos-utilizados-para-ilustrar-os-conceitos">4. Exemplos
+utilizados para ilustrar os conceitos</h2>
+<h3 id="exemplos-do-livro-citados-na-reunião">Exemplos do livro citados
+na reunião</h3>
+<ul>
+<li>Exemplo de pedido com múltiplos itens para mostrar mapeamento
+objeto-relacional e risco de N+1.</li>
+<li>Exemplo do perfil tipo LinkedIn/Bill Gates para comparar documento
+único vs múltiplas tabelas normalizadas.</li>
+<li>Exemplo de relações entre usuário, empregos, organizações e escolas
+para discutir many-to-many.</li>
+<li>Exemplo de modelagem em grafo (lugares/pessoa e relação “nasceu em”
+-&gt; “está em”) e consulta por padrão de caminho.</li>
+</ul>
+<h3 id="exemplos-práticos-trazidos-pelos-participantes">Exemplos
+práticos trazidos pelos participantes</h3>
+<ul>
+<li>Arquitetura em camadas (analogia com <em>Game Engine
+Architecture</em>).</li>
+<li>APIs diferentes por plataforma (Windows/Linux) como analogia de
+abstração por camadas.</li>
+<li>Uso de <code>struct</code> em C para explicar proximidade de dados
+em memória.</li>
+<li>Cenário de grande escala (milhões de usuários) e impacto da
+distribuição de dados em múltiplas máquinas.</li>
+<li>Relato de projeto com MongoDB e dificuldades com dados duplicados,
+referências e perda de otimização.</li>
+<li>Proposta de laboratório para comparar relacional/documento/grafo em
+performance e complexidade de implementação.</li>
+</ul>
+</body>
