@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Site do proggers bookclub">
+    <meta name="keywords" content="programming, programação, clube do livro, bookclub">
+    <link rel="stylesheet" href="../../holiday.css">
+    <title>Proggers Bookclub</title>
+    <style>
+        h2:target::before {
+            content: ">> ";
+        }
+    </style>
+</head>
+
+<body>
+	<header>
+		<p style="margin-bottom: 0px;">
+			<a href="https://guites.github.io/proggers/">
+				<img width="25" height="36.5" src="../../Poggers-res.png"/>
+				<strong>Proggers Bookclub</strong>
+				<img width="25" height="36.5" src="../../Poggers-flop.png"/>
+			</a>
+		</p>
+		<p style="margin-top: 0px;">
+			Clube do livro de programação.
+		</p>
+		<p style="margin-top: 0px;"><small>abra um pr para editar essa pagina: <a href="https://github.com/guites/proggers">github.com/guites/proggers</a>.</small></p>
+	</header>
+<h1>Material do terceiro encontro (29/04/2026)</h1>
+<p><strong>Livro:</strong> <em>Designing Data-Intensive Applications</em><br />
+<strong>Capítulo discutido:</strong> Capítulo 3 - <em>Storage and Retrieval</em><br />
+<strong>Data da reunião:</strong> 29 de abril de 2026</p>
+<hr/>
+<p>Este foi o material usado para guiar a reunião. O resumo se encontra em <a href="https://guites.github.io/proggers/ddia/3/notes.html">https://guites.github.io/proggers/ddia/3/notes.html</a>.</p>
+<h2 id="chapter-3-storage-and-retrieval">Chapter 3: Storage and
+Retrieval</h2>
+<p>The way we store data is highly dependant on how we expect to read
+that data.</p>
+<p>Databases can be split into two main categories, based on how we read
+from and write to them.</p>
+<p><strong>OLTP</strong> (On Line Transaction Processing) are most
+common to web developers: speciallized on handle large volumes of
+request, where each request tends to focus on a small subset of data,
+generally specific rows.</p>
+<p>Each row is queried by an index and them updated individually.
+Operations that depend on each other (where a single failure means the
+set of operations should be reverted) are treated atomically in a
+<em>transaction</em>.</p>
+<p>Disk seek time (when querying data that match exact parameters) is
+often the bottleneck.</p>
+<p><strong>OLAP</strong> (On Line Analytics Processing), in contrast,
+tend to focus on aggregation and summarization of a large volume of
+rows.</p>
+<p>Since each query might scan through large portions of a table,
+indexing is generally less effective.</p>
+<p>Disk bandwidth is often the bottleneck, with data warehouses
+optimizing for read in detriment of write time.</p>
+<p>On the OLTP side, there are two main ways to structure storage
+engines.</p>
+<p><strong>Log-structured</strong> is a more recent development which is
+gaining popularity (<em>why?</em>).</p>
+<p>It is based on performing sequential writes on files and then
+deleting obsolete files, without ever updating past writes, which
+results in higher write throughput.</p>
+<p><strong>Updating-in-place</strong> treats the disk as a set of
+fixed-size pages that can be overwritten.</p>
+<p>B-trees are a popular way to index data that allows for quickly
+finding and replacing stale data.</p>
+<p>The way that information is saved to disk can also affect how we
+access our data, and can be adapted to best fit our model.</p>
+<p>In most OLTP databases, storage is <em>row-oriented</em>: in a
+relational database this means that values from the same table are
+stored next to each other in disk.</p>
+<p>In a document database that would mean that an entire document would
+be stored as a contiguous sequence of bytes.</p>
+<p>When processing analytical data, it might be better to storage data
+in a <em>column-oriented</em> way. This would mean that for each table
+the values would be split by column, and values from the same column
+would be stored close to each other in disk.</p>
+<p>This would make queries such as
+<code>SELECT name, residency, hobby FROM users</code> more straight
+forward.</p>
+<details>
+<summary>ᶘ ᵒᴥᵒᶅ It does introduces some drawbacks. For example, how would
+you keep information sorted accross multipe columns?</summary>
+
+<p>Discuss!</p>
+</details>
+
+<h3 id="indexing-row-data">Indexing row data</h3>
+<p>Referência: <a
+href="https://use-the-index-luke.com/sql/preface">https://use-the-index-luke.com/sql/preface</a>.</p>
+<p>Nós conversamos na última reunião sobre como a abstração do SQL vaza
+quando o desenvolvedor começa a pensar sobre performance.</p>
+<p>Geralmente não pensamos em <em>como</em> a informação vai ser buscada
+no banco, e sim em <em>qual</em> informação queremos buscar.</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> date_of_birth</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> employees</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a> <span class="kw">WHERE</span> last_name <span class="op">=</span> <span class="st">&#39;Garcia&#39;</span></span></code></pre></div>
+<p>Na medida em que o desenvolvedor precisa garantir requisitos de
+performance, ele precisa entender sobre como a informação é organizada
+no banco.</p>
+<blockquote>
+<p>The abstraction reaches its limits when it comes to performance: the
+author of an SQL statement by definition does not care how the database
+executes the statement. Consequently, the author is not responsible for
+slow execution. However, experience proves the opposite; i.e., the
+author must know a little bit about the database to prevent performance
+problems.</p>
+</blockquote>
+<p>A performance pode ser melhorada sem muito conhecimento de como os
+dados são salvos, nem de como a engine realiza as buscas (a
+implementação em C de um query do sqlite3, por exemplo).</p>
+<p>O fator de maior impacto é o <strong>padrão de acesso aos
+dados</strong>. Conhecer como os dados são acessados é o que vai
+decidir, entre outras coisas, a escolha do tipo de storage (relacional
+vs. document oriented vs. vetorial).</p>
+<details>
+<summary>ᶘ ᵒᴥᵒᶅ Em um time, quem costuma ter o conhecimento sobre o
+padrão de acesso aos dados?</summary>
+
+<p>Na maioria dos casos, quem possui esse conhecimento é justamente o
+desenvolvedor.</p>
+</details>
+
+<h3 id="what-is-an-index">What is an index</h3>
+<p>Referência: <a
+href="https://use-the-index-luke.com/sql/anatomy">https://use-the-index-luke.com/sql/anatomy</a>.</p>
+<p>Um índice faz a consulta ficar rápida. Ele é uma estrutura distinta
+da tabela onde ele age, criada com o comando <code>create index</code>,
+que referencia a tabela.</p>
+<p>Ele ocupa espaço no banco e possui uma cópia dos dados indexados da
+tabela alvo.</p>
+<blockquote>
+<p>That means that an index is pure redundancy.</p>
+</blockquote>
+<p>Buscar em um índice é como buscar um nome em uma lista telefonica ou
+palavras em um dicionário. O princípio fundamental é que elas vão estar
+organizadas em uma ordem conhecida.</p>
+<p>A diferença é que o índice do banco está sempre sendo atualizado.
+Como os dados são ordenados, cada atualização envolve uma mudança nos
+dados já existentes.</p>
+<p>O desafio da construção de índices eficientes é reduzir o impacto das
+escritas e atualizações redundantes quando os dados da tabela de
+referência são alterados.</p>
+<p>Os bancos costumam usar duas estruturas de dado na solução desse
+problema: a <em>doubly linked list</em> e a <em>search tree</em>.</p>
+<h3 id="index-leaf-nodes">Index leaf nodes</h3>
+<p>Reference: <a
+href="https://use-the-index-luke.com/sql/anatomy/the-leaf-nodes">https://use-the-index-luke.com/sql/anatomy/the-leaf-nodes</a>.</p>
+<p>Os índices precisam manter uma ordem mas também permitir inserção de
+novos valores em qualquer lugar de forma rápida.</p>
+<p>Os bancos usam listas duplamente encadeadas para desacoplar a ordem
+lógica dos elementos da sua ordem física na memória.</p>
+<p>Cada elemento da lista é um <em>database block</em> (ou <em>database
+page</em>), que é o elemento de menor tamanho utilizado pelo banco,
+geralmente alguns kbs</p>
+<blockquote>
+<p>Every table and index is stored as an array of pages of a fixed size
+(usually 8 kB, although a different page size can be selected when
+compiling the server).</p>
+<p><a
+href="https://www.postgresql.org/docs/current/storage-page-layout.html">PostgreSQL
+docs</a></p>
+</blockquote>
+<p>O banco salva a maior quantidade possível de índices em cada
+página/bloco.</p>
+<blockquote>
+<p>That means that the index order is maintained on two different
+levels: the index entries within each leaf node, and the leaf nodes
+among each other using a doubly linked list.</p>
+</blockquote>
+<p><img src="./index-leaf-nodes-and-corresponding-tabel-data.png"
+alt="index-leaf-nodes-and-corresponding-tabel-data.png" /></p>
+<p>A imagem representa cada índice composto por dois valores: o valor da
+coluna, usado na ordenação (lado esquerdo) e o endereço da linha em
+memória, na direita.</p>
+<p>Podemos imaginar que índices criados para colunas com tipos complexos
+são mais pesados.</p>
+<p>A ilustração também mostra que, em bancos <em>row oriented</em>,
+todas as colunas de um mesmo row vão estar salvos de forma adjacente na
+memória: após encontrar um row baseado num índice, é fácil acessar suas
+outras colunas.</p>
+<details>
+<summary>ᶘ ᵒᴥᵒᶅ Como funcionaria a busca por valores em um índice feito
+apenas com linked lists?</summary>
+
+<p>Discuss!</p>
+</details>
+
+<h3 id="the-search-tree">The Search Tree</h3>
+<p>Se usassemos apenas a lista duplamente encadeada, mesmo sabendo que
+ela é ordenada, buscas ainda seriam demoradas, pois teriamos que ler os
+valores de um a um, partindo ou do início ou do fim da lista.</p>
+<p>Para agilizar a busca, uma estrutura adicional é utilizada: a
+<em>balanced search tree</em>, a B-tree.</p>
+<p><img src="./b-tree-structure.png" alt="b-tree-structure.png" /></p>
+<p>A lista encadeada estabelece a ordem entre os nós (<em>leaf
+nodes</em>), enquanto a B-tree relaciona diferente nós baseados no seu
+maior valor.</p>
+<p>Essa estrutura permite realização de <em>binary search</em> nos
+dados, que possui O(log(n)).</p>
+<blockquote>
+<p>A B-tree is a balanced tree—not a binary tree.</p>
+</blockquote>
+<p>A estrutura é <em>balanceada</em> pois a profundidade (depth) da
+árvore é a mesma em todas as posições, além de crescer de forma
+<em>logaritmica</em>.</p>
+<details>
+<summary>ᶘ ᵒᴥᵒᶅ Como podemos garantir a taxa de crescimento da profundidade da árvore?</summary>
+
+<p>Discuss!</p>
+</details>
+
+<table>
+<thead>
+<tr class="header">
+<th>Tree Depth</th>
+<th>Index Entries</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>3</td>
+<td>64</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>256</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>1,024</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>4,096</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>16,384</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>65,536</td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>262,144</td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>1,048,576</td>
+</tr>
+</tbody>
+</table>
+<p>Para um exemplo de quatro itens por nó, temos a quantidade acima de
+itens por nível de profundidade: bancos de dados podem guardar até
+centenas de itens por nó.</p>
+<h3 id="o-que-é-salvo-em-um-index">O que é salvo em um index</h3>
+<p>Nos exemplos anteriores assumimos que o índice é composto de dois
+elementos: uma chave (o valor da coluna indexada, usado na busca) e um
+valor (o endereço na memória da linha da tabela onde valor buscado está
+salvo).</p>
+<p>Quando salvamos o endereço (ou referência), significa as linhas da
+tabela estão salvas em uma <em>heap file</em>, ou seja, sem ordem
+definida.</p>
+<p>Referência (heaps): <a
+href="https://learn.microsoft.com/en-us/sql/relational-databases/indexes/heaps-tables-without-clustered-indexes?view=sql-server-ver17">https://learn.microsoft.com/en-us/sql/relational-databases/indexes/heaps-tables-without-clustered-indexes?view=sql-server-ver17</a>.</p>
+<details>
+<summary>ᶘ ᵒᴥᵒᶅ Qual o benefício de usar uma heap file pra salvar os dados da tabela?</summary>
+
+<p>Esse formato é comum pois quando múltiplos índices são criados (por
+ex. um por coluna), a quantidade de dados duplicados é reduzido.
+Alterações nos valores também não precisam ser propagadas entre todos os
+índices.</p>
+<p>O uso do heap file também faz sentido como forma de otimizar os
+writes: não precisamos alocar espaço de antemão, e a inserção de novas
+linhas geralmente acontece em qualquer lugar da memória que possua
+espaço livre.</p>
+</details>
+
+<p>Uma alternativa é salvar o valor inteiro da linha. Isso ajuda em
+situações onde precisamos otimizar ao máximo a performance dos reads
+(queremos evitar o lookup na memória para encontrar a linha referente ao
+índice).</p>
+<p>Isso é chamado de <em>clustered index</em>. No MySQL, com a engine
+InnoDB, a chave primária é sempre um clustered index. Nesse caso, chaves
+secundárias podem apontar pro endereço da chave primária ao invés do
+endereço na heap file.</p>
+<p>Chamamos de <em>covering index</em> quando apenas algumas colunas da
+tabela são duplicadas no índice. Assim, alguns queries são
+<em>cobertos</em> pelo índice, pois podem ser respondidos sem precisar
+fazer o lookup para a heapfile.</p>
+<details>
+<summary>ᶘ ᵒᴥᵒᶅ Quais tradeoffs devem ser considerados ao decidir entre
+_clustered_, _covering_ e _reference indexes_?</summary>
+
+<ul>
+<li>read vs write speed tradeoff</li>
+<li>additional storage</li>
+<li>transactional guarantees (reducing inconsistencies on failure)</li>
+</ul>
+</details>
+<p></p>
+<details>
+<summary>ᶘ ᵒᴥᵒᶅ Como você definiria índices baseados em mais de uma coluna?</summary>
+
+<p>Discuss!</p>
+<p>Follow up: como você trabalharia com queries baseados em
+intervalos?</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> restaurants <span class="kw">WHERE</span> latitute <span class="op">&gt;</span> <span class="fl">51.4946</span> <span class="kw">AND</span> latitude <span class="op">&lt;</span> <span class="fl">51.5079</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a> <span class="kw">AND</span> longitude <span class="op">&gt;</span> <span class="op">-</span><span class="fl">0.1162</span> <span class="kw">AND</span> longitude <span class="op">&lt;</span> <span class="op">-</span><span class="fl">0.1004</span>;</span></code></pre></div>
+</details>
+<p></p>
+</body>
