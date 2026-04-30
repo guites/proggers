@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Site do proggers bookclub">
+    <meta name="keywords" content="programming, programação, clube do livro, bookclub">
+    <link rel="stylesheet" href="../../holiday.css">
+    <title>Proggers Bookclub</title>
+    <style>
+        h2:target::before {
+            content: ">> ";
+        }
+    </style>
+</head>
+
+<body>
+	<header>
+		<p style="margin-bottom: 0px;">
+			<a href="https://guites.github.io/proggers/">
+				<img width="25" height="36.5" src="../../Poggers-res.png"/>
+				<strong>Proggers Bookclub</strong>
+				<img width="25" height="36.5" src="../../Poggers-flop.png"/>
+			</a>
+		</p>
+		<p style="margin-top: 0px;">
+			Clube do livro de programação.
+		</p>
+		<p style="margin-top: 0px;"><small>abra um pr para editar essa pagina: <a href="https://github.com/guites/proggers">github.com/guites/proggers</a>.</small></p>
+	</header>
+<h1>Notas do terceiro encontro (29/04/2026)</h1>
+    <p><strong>Livro:</strong> <em>Designing Data-Intensive Applications</em><br />
+    <strong>Capítulo discutido:</strong> Capítulo 3 - <em>Storage and Retrieval</em><br />
+    <strong>Data da reunião:</strong> 29 de abril de 2026</p>
+    <hr/>
+    <p><strong>Aviso:</strong> Este resumo foi gerado por IA usando como entrada o áudio transcrito da reunião.</p>
+    <details><summary>Prompt utilizado</summary>
+    <pre><code>Me ajude a gerar um relatório desta reunião de estudos que teve como foco
+  discussão do capitulo 3 (Storage and Retrieval) do
+  livro Designing Data Intensive Applications.
+ 
+  A transcrição está no arquivo "transcript.txt" no diretório atual.
+ 
+  Você deve criar um documento com os seguintes pontos:
+ 
+  1. Resumo (cerca de 300 palavras)
+  2. Principais tópicos debatidos (até 10)
+  3. Principais questões levantadas (ex. "Como gerenciar rollback em sistemas
+  com muitos usuários?")
+  4. Exemplos utilizados para ilustrar os conceitos abordados
+ 
+  Foque apenas na parte que diz respeito ao estudo do livro. Ignore discussões prévias sobre outros assuntos.</code></pre>
+    </details>
+    <hr/>
+<h2 id="1-resumo">1. Resumo</h2>
+<p>A reunião técnica concentrou-se na discussão do capítulo 3, com foco
+em como bancos de dados armazenam e recuperam dados de forma eficiente
+em diferentes cenários de carga. O grupo começou diferenciando padrões
+de uso: em OLTP, predominam muitas operações curtas sobre pequenos
+subconjuntos de dados, com forte dependência de índices e garantias
+transacionais; em OLAP, as consultas percorrem grandes volumes para
+agregações, e o gargalo tende a ser a largura de banda de leitura do
+disco para memória.</p>
+<p>A discussão avançou para os dois grandes modelos do capítulo:
+estruturas log-structured (incluindo LSM-trees) e B-trees. Foi
+enfatizado que log-structured favorece escrita rápida por
+<em>append</em> sequencial, enquanto B-trees tendem a favorecer
+atualizações e leituras pontuais com estrutura já organizada para busca.
+Em seguida, o grupo explorou um exemplo didático de banco chave-valor em
+arquivo com operações <code>get/set</code>, destacando riscos de
+corrupção em interrupções de escrita e a necessidade de compactação.</p>
+<p>Para desempenho de leitura, discutiu-se o uso de índice em memória
+(hash index) mapeando chave para <em>offset</em> no arquivo, evitando
+varredura linear. A partir daí, foi detalhado o ciclo MemTable →
+SSTable: escrita inicial em estrutura ordenada em memória (árvore
+balanceada), persistência em SSTable ao atingir limite, manutenção de
+múltiplos segmentos e execução de <em>merge/compaction</em> em
+<em>background</em> para remover versões antigas e reduzir
+fragmentação.</p>
+<p>Também foram abordados Bloom filters (checagem probabilística de
+existência), índices esparsos e blocos comprimíveis para diminuir I/O,
+além de armazenamento por linha versus por coluna e seus impactos em
+consultas transacionais e analíticas. Houve ainda ênfase no custo de
+manter consistência sob concorrência, no papel do cache para reduzir
+acessos ao disco e na diferença entre atualizar registros no lugar
+(<em>update-in-place</em>) e acumular versões para consolidação
+posterior.</p>
+<p>Como encaminhamento, o grupo indicou continuidade do capítulo na
+reunião seguinte, com possibilidade de diagramas para consolidar os
+fluxos de leitura/escrita.</p>
+<h2 id="2-principais-tópicos-debatidos-até-10">2. Principais tópicos
+debatidos (até 10)</h2>
+<ol type="1">
+<li>Diferenças de padrão de acesso entre OLTP e OLAP.</li>
+<li>Gargalos de desempenho: latência de busca vs largura de banda de
+leitura.</li>
+<li>Trade-offs entre log-structured/LSM e B-trees.</li>
+<li>Banco chave-valor em arquivo (<code>get/set</code>) como modelo
+didático.</li>
+<li>Hash index em memória (chave → offset) para leitura direta.</li>
+<li>Compactação e <em>merge</em> de segmentos para remover versões
+antigas.</li>
+<li>SSTables ordenadas e eficiência de <em>merge</em> em LSM-trees.</li>
+<li>MemTable (árvore balanceada) e <em>flush</em> para SSTable.</li>
+<li>Bloom filters e índices esparsos para reduzir leituras
+desnecessárias.</li>
+<li>Armazenamento por linha vs por coluna e impacto nas consultas.</li>
+</ol>
+<h2 id="3-principais-questões-levantadas">3. Principais questões
+levantadas</h2>
+<ul>
+<li>Existe banco de dados multi-threaded que permita múltiplas consultas
+simultâneas com boa consistência?</li>
+<li>Por que o processo de <em>merge</em> entre segmentos é necessário em
+arquiteturas log-structured?</li>
+<li>Onde ficam as versões antigas dos dados após criação de novas
+SSTables?</li>
+<li>Como equilibrar velocidade de escrita com custo de compactação em
+<em>background</em>?</li>
+<li>Em quais cenários vale priorizar B-trees em vez de LSM-trees?</li>
+<li>Qual o papel prático de Bloom filter quando há muitos segmentos em
+disco?</li>
+</ul>
+<h2 id="4-exemplos-utilizados-para-ilustrar-os-conceitos">4. Exemplos
+utilizados para ilustrar os conceitos</h2>
+<ul>
+<li>Implementação didática de banco em arquivo com <code>get</code> e
+<code>set</code>.</li>
+<li>Comparação entre busca linha a linha e busca via hash index em
+memória.</li>
+<li>Mapeamento de chaves para <em>offsets</em> de bytes para acesso
+direto no arquivo.</li>
+<li>Pipeline de escrita: MemTable em RAM (árvore balanceada) → geração
+de SSTable no disco.</li>
+<li>Leitura em camadas: MemTable primeiro, depois SSTables do segmento
+mais novo para o mais antigo.</li>
+<li><em>Merge/compaction</em> em <em>background</em> para consolidar
+segmentos e manter só o valor mais recente por chave.</li>
+<li>Uso de índice esparso + blocos comprimíveis para “pular” partes
+grandes do arquivo.</li>
+</ul>
+</body>
